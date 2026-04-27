@@ -1,0 +1,6 @@
+{
+  "name": "Capacitor Notification Tester",
+  "description": "A simple mobile app to test Capacitor local and remote push notifications.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
