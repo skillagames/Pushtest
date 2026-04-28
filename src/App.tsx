@@ -60,7 +60,7 @@ export default function App() {
             await LocalNotifications.requestPermissions();
         }
     } catch (error: any) {
-        addLog(`Error requesting local notification permission: ${error.message}`);
+        addLog(`Error setting up local notifications: ${error.message}`);
     }
   }
 
@@ -123,16 +123,19 @@ export default function App() {
         
         if (permStatus.display !== 'granted') {
             addLog('Local notification permission denied');
-            // Check if we are on web, we might fall back to browser Notification API
-            if (!Capacitor.isNativePlatform() && 'Notification' in window) {
-              addLog('Falling back to web notifications...');
-              const webPerm = await window.Notification.requestPermission();
-              if (webPerm === 'granted') {
-                new window.Notification("Test Local Web Notification", { body: "This works on web too!" });
-                addLog('Web notification sent immediately.');
-              }
-            }
             return;
+        }
+
+        if (Capacitor.getPlatform() === 'android') {
+            await LocalNotifications.createChannel({
+                id: 'primary_notifications_v3',
+                name: 'Primary Notifications',
+                description: 'General notifications',
+                importance: 5,
+                visibility: 1,
+                vibration: true,
+                sound: 'default'
+            });
         }
 
         await LocalNotifications.schedule({
@@ -140,9 +143,10 @@ export default function App() {
                 {
                     title: "Test Local Notification",
                     body: "This is a local notification triggered just now!",
-                    id: Math.floor(Math.random() * 100000),
+                    id: Math.floor(Date.now() / 1000), // id max value in android capacitor is Int32 Max (2147483647). Date.now() is too large
                     schedule: { at: new Date(Date.now() + 3000) }, // 3 seconds from now
-                    sound: undefined,
+                    channelId: "primary_notifications_v3",
+                    sound: 'default',
                     attachments: undefined,
                     actionTypeId: "",
                     extra: null
@@ -151,6 +155,7 @@ export default function App() {
         });
         
         addLog('Local notification scheduled in 3 seconds');
+        alert("Notification triggered on channel: primary_notifications_v3");
     } catch (e: any) {
         addLog(`Local notification error: ${e.message}`);
     }
