@@ -146,6 +146,7 @@ export default function App() {
                     id: Math.floor(Date.now() / 1000), // id max value in android capacitor is Int32 Max (2147483647). Date.now() is too large
                     schedule: { at: new Date(Date.now() + 3000) }, // 3 seconds from now
                     channelId: "primary_notifications_v3",
+                    smallIcon: "ic_stat_notification",
                     sound: 'default',
                     attachments: undefined,
                     actionTypeId: "",
